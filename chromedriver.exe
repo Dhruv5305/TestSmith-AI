@@ -1,0 +1,39 @@
+"""
+Auto-generated Selenium test by TestSmith AI
+Fixed driver path issue for Windows
+"""
+
+import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import os
+
+
+@pytest.fixture
+def driver():
+    """
+    Fixture to initialize and quit Chrome WebDriver
+    """
+    options = Options()
+    options.add_argument("--headless")  # safer for compatibility
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    # Force correct .exe path
+    driver_path = ChromeDriverManager().install()
+    if not driver_path.endswith(".exe"):
+        driver_path = os.path.join(os.path.dirname(driver_path), "chromedriver.exe")
+
+    driver = webdriver.Chrome(service=ChromeService(driver_path), options=options)
+    yield driver
+    driver.quit()
+
+
+def test_open_google(driver):
+    """
+    Objective: Open google.com homepage and verify title
+    """
+    driver.get("https://www.google.com")
+    assert "Google" in driver.title
